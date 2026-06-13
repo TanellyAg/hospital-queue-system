@@ -5,7 +5,10 @@ from django.utils import timezone
 from .models import Queue, ConsultationLog
 from .serializers import QueueSerializer
 from appointments.models import Appointment
+from ml_model.predictor import predict_wait_time
+from django.utils import timezone as tz
 from notifications.sms import send_queue_number, send_turn_notification
+
 
 
 def calculate_estimated_wait_time(doctor, queue_date, queue_number):
@@ -84,6 +87,21 @@ class JoinQueueView(APIView):
             queue_date=appointment.appointment_date,
             estimated_wait_time=estimated_wait
         )
+
+        # Get ML prediction for wait time
+        now = tz.now()
+        doctor_type_num = 1 if appointment.doctor.doctor_type == 'specialist' else 0
+
+        ml_wait = predict_wait_time(
+            patients_ahead=queue_number - 1,
+            time_of_day=now.hour,
+            day_of_week=appointment.appointment_date.weekday(),
+            doctor_type=doctor_type_num,
+            avg_consultation_time=appointment.doctor.avg_consultation_time
+        )
+
+        queue_entry.ml_predicted_wait_time = ml_wait
+        queue_entry.save()
 
         # Send SMS with queue number to patient
         if request.user.phone_number:
