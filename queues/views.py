@@ -5,6 +5,7 @@ from django.utils import timezone
 from .models import Queue, ConsultationLog
 from .serializers import QueueSerializer
 from appointments.models import Appointment
+from notifications.sms import send_queue_number, send_turn_notification
 
 
 def calculate_estimated_wait_time(doctor, queue_date, queue_number):
@@ -14,14 +15,13 @@ def calculate_estimated_wait_time(doctor, queue_date, queue_number):
     Formula: patients ahead × doctor's average consultation time
     """
     patients_ahead = queue_number - 1
-    avg_time = doctor.avg_consultation_time  # in minutes
+    avg_time = doctor.avg_consultation_time
     return patients_ahead * avg_time
 
 
 def assign_queue_number(doctor, queue_date):
     """
     Assigns the next available queue number for a doctor on a given date.
-    Counts existing queue entries for that doctor on that day and adds 1.
     """
     last_queue = Queue.objects.filter(
         doctor=doctor,
@@ -30,7 +30,7 @@ def assign_queue_number(doctor, queue_date):
 
     if last_queue:
         return last_queue.queue_number + 1
-    return 1  # First patient of the day gets queue number 1
+    return 1
 
 
 class JoinQueueView(APIView):
@@ -44,7 +44,6 @@ class JoinQueueView(APIView):
         appointment_id = request.data.get('appointment_id')
 
         try:
-            # Get the appointment and verify it belongs to this patient
             appointment = Appointment.objects.get(
                 id=appointment_id,
                 patient=request.user,
@@ -86,6 +85,10 @@ class JoinQueueView(APIView):
             estimated_wait_time=estimated_wait
         )
 
+        # Send SMS with queue number to patient
+        if request.user.phone_number:
+            send_queue_number(request.user, queue_entry)
+
         return Response(
             QueueSerializer(queue_entry).data,
             status=status.HTTP_201_CREATED
@@ -99,7 +102,6 @@ class MyQueueStatusView(APIView):
     def get(self, request):
         today = timezone.now().date()
 
-        # Get today's queue entry for this patient
         queue_entry = Queue.objects.filter(
             patient=request.user,
             queue_date=today,
@@ -146,7 +148,6 @@ class TodayQueueView(APIView):
         ).select_related(
             'patient', 'doctor__user', 'appointment'
         ).order_by(
-            # Urgent appointments shown first
             'appointment__triage_level',
             'queue_number'
         )
@@ -157,7 +158,6 @@ class TodayQueueView(APIView):
 class UpdateQueueStatusView(APIView):
     """
     Admin/staff updates a patient's queue status.
-    e.g. mark as in_progress when called, completed when done.
     Records actual times for ML training data.
     """
     permission_classes = [permissions.IsAuthenticated]
@@ -182,6 +182,10 @@ class UpdateQueueStatusView(APIView):
         if new_status == 'in_progress':
             # Record when consultation started
             queue_entry.actual_start_time = timezone.now()
+
+            # Notify patient it's their turn
+            if queue_entry.patient.phone_number:
+                send_turn_notification(queue_entry.patient, queue_entry)
 
         elif new_status == 'completed':
             # Record when consultation ended
