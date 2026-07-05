@@ -6,7 +6,9 @@ from .views import (
     DoctorListView,
     DoctorAvailabilityView,
     AdminAppointmentsView,
-    UpdateAppointmentStatusView
+    UpdateAppointmentStatusView,
+    UpdateDoctorStatusView,
+    UpdateDoctorAvailabilityView
 )
 
 urlpatterns = [
@@ -22,4 +24,6 @@ urlpatterns = [
     # Admin endpoints
     path('admin/all/', AdminAppointmentsView.as_view(), name='admin-appointments'),
     path('admin/<int:pk>/status/', UpdateAppointmentStatusView.as_view(), name='update-status'),
+    path('admin/doctors/<int:pk>/toggle-status/', UpdateDoctorStatusView.as_view(), name='admin-toggle-doctor-status'),
+    path('admin/availability/<int:pk>/toggle/', UpdateDoctorAvailabilityView.as_view(), name='admin-toggle-availability'),
 ]

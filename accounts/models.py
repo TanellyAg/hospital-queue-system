@@ -2,6 +2,18 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
+class Hospital(models.Model):
+    name = models.CharField(max_length=200)
+    address = models.TextField()
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    latitude = models.FloatField(default=4.15)  # Default coordinates near Buea
+    longitude = models.FloatField(default=9.24)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+
 class User(AbstractUser):
     ROLE_CHOICES = (
         ('patient', 'Patient'),
@@ -11,6 +23,7 @@ class User(AbstractUser):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='patient')
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
+    hospital = models.ForeignKey(Hospital, on_delete=models.SET_NULL, null=True, blank=True, related_name='users')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

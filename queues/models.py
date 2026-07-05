@@ -69,7 +69,7 @@ class Queue(models.Model):
         unique_together = ['doctor', 'queue_date', 'queue_number']
 
     def __str__(self):
-        return f"Queue #{self.queue_number} - {self.patient.get_full_name() - {self.queue_date}}"
+        return f"Queue #{self.queue_number} - {self.patient.get_full_name()} - {self.queue_date}"
     
     @property
     def display_wait_time(self):

@@ -38,15 +38,15 @@ def train_models():
     lr_model = LinearRegression()
     lr_model.fit(X_train, y_train)
 
-    lr_predicitons = lr_model.predict(X_test)
-    lr_rmse = np.sqrt(mean_squared_error(y_test, lr_predicitons))
-    lr_r2 = r2_score(y_test, lr_predicitons)
+    lr_predictions = lr_model.predict(X_test)
+    lr_rmse = np.sqrt(mean_squared_error(y_test, lr_predictions))
+    lr_r2 = r2_score(y_test, lr_predictions)
 
-    print(f"Linear Regression RSME: {lr_rmse:.2f} minutes")
+    print(f"Linear Regression RMSE: {lr_rmse:.2f} minutes")
     print(f"Linear Regression R² Score: {lr_r2:.4f}")
 
     # ---- Model 2: Random Forest (Primary) ----
-    print(f"\nTraining Random Forest (Prrimary)...")
+    print(f"\nTraining Random Forest (Primary)...")
     rf_model = RandomForestRegressor(
         n_estimators=100,   #100 decision trees
         max_depth=10,       #prevents overfitting
@@ -83,7 +83,7 @@ def train_models():
     #--- Save Models ---
     models_dir = os.path.join(os.path.dirname(__file__), 'saved_models')
 
-    joblib.dump(lr_model, os.path.join(models_dir, 'linear_regression_mode;.pkl'))
+    joblib.dump(lr_model, os.path.join(models_dir, 'linear_regression_model.pkl'))
     joblib.dump(rf_model, os.path.join(models_dir, 'random_forest_model.pkl'))
 
     print("\n" + "=" * 50)

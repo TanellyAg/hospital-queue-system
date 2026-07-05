@@ -11,6 +11,7 @@ class Appointment(models.Model):
     )
 
     TRIAGE_CHOICES = (
+        ('emergency', 'Emergency'),
         ('urgent', 'Urgent'),
         ('routine', 'Routine'),
     )
@@ -30,7 +31,7 @@ class Appointment(models.Model):
         ordering = ['appointment_date', 'appointment_time']
 
     def __str__(self):
-        return f"{self.patient.get_full_name()} → Dr.{self.doctor.useer.get_full_name()} on {self.appointment_date} at {self.appointment_time}"
+        return f"{self.patient.get_full_name()} → Dr.{self.doctor.user.get_full_name()} on {self.appointment_date} at {self.appointment_time}"
     
 class DoctorAvailability(models.Model):
     DAY_CHOICES = (
@@ -52,8 +53,8 @@ class DoctorAvailability(models.Model):
     class Meta:
         #a doctor can only have one schedeule entry per day
         unique_together = ['doctor', 'day_of_week']
-        
-        def __str__(self):
-            return f"Dr.{self.doctor.user.get_full_name()} - {self.get_day_of_week_display()}"
+
+    def __str__(self):
+        return f"Dr.{self.doctor.user.get_full_name()} - {self.get_day_of_week_display()}"
 
 

@@ -57,7 +57,7 @@ class BookAppointmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Appointment
-        fields = ['doctor', 'appointment_date', 'appointment_time', 'symptoms']
+        fields = ['id', 'doctor', 'appointment_date', 'appointment_time', 'symptoms']
 
     def validate(self, attrs):
         doctor = attrs['doctor']
