@@ -2,12 +2,14 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.utils import timezone
+from django.db.models import Case, When, Value, IntegerField
+from accounts.models import User, DoctorProfile
 from .models import Queue, ConsultationLog
 from .serializers import QueueSerializer
 from appointments.models import Appointment
 from ml_model.predictor import predict_wait_time
 from django.utils import timezone as tz
-from notifications.sms import send_queue_number, send_turn_notification
+from notifications.sms import send_queue_number, send_turn_notification, send_sms
 
 
 
@@ -132,16 +134,65 @@ class MyQueueStatusView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        # Count how many patients are ahead
-        patients_ahead = Queue.objects.filter(
+        # Count how many patients are ahead based on priority (emergency -> urgent -> routine) and queue number
+        waiting_entries = Queue.objects.filter(
             doctor=queue_entry.doctor,
             queue_date=today,
-            queue_number__lt=queue_entry.queue_number,
             status='waiting'
-        ).count()
+        ).select_related('appointment')
+
+        def get_priority(entry):
+            level = entry.appointment.triage_level
+            if level == 'emergency':
+                return 1
+            if level == 'urgent':
+                return 2
+            return 3
+
+        my_priority = get_priority(queue_entry)
+        patients_ahead = 0
+        for entry in waiting_entries:
+            if entry.id == queue_entry.id:
+                continue
+            entry_priority = get_priority(entry)
+            if entry_priority < my_priority:
+                patients_ahead += 1
+            elif entry_priority == my_priority and entry.queue_number < queue_entry.queue_number:
+                patients_ahead += 1
+
+        # Check if there is an active emergency in progress for this doctor today
+        active_emergency = Queue.objects.filter(
+            doctor=queue_entry.doctor,
+            queue_date=today,
+            status__in=['waiting', 'in_progress'],
+            appointment__triage_level='emergency'
+        ).exists()
+
+        # Calculate dynamic wait times based on the actual live patients_ahead count
+        avg_time = queue_entry.doctor.avg_consultation_time
+        dynamic_static_wait = patients_ahead * avg_time
+        
+        # Calculate dynamic ML predicted wait time
+        doctor_type_num = 1 if queue_entry.doctor.doctor_type == 'specialist' else 0
+        current_hour = timezone.now().time().hour
+        day_of_week = today.weekday()
+        
+        dynamic_ml_predicted_wait = predict_wait_time(
+            patients_ahead=patients_ahead,
+            time_of_day=current_hour,
+            day_of_week=day_of_week,
+            doctor_type=doctor_type_num,
+            avg_consultation_time=avg_time
+        )
 
         data = QueueSerializer(queue_entry).data
         data['patients_ahead'] = patients_ahead
+        data['active_emergency'] = active_emergency
+        
+        # Dynamic overrides
+        data['estimated_wait_time'] = dynamic_static_wait
+        data['ml_predicted_wait_time'] = dynamic_ml_predicted_wait
+        data['display_wait_time'] = dynamic_ml_predicted_wait if dynamic_ml_predicted_wait is not None else dynamic_static_wait
 
         return Response(data)
 
@@ -165,8 +216,16 @@ class TodayQueueView(APIView):
             queue_date=today
         ).select_related(
             'patient', 'doctor__user', 'appointment'
+        ).annotate(
+            triage_priority=Case(
+                When(appointment__triage_level='emergency', then=Value(1)),
+                When(appointment__triage_level='urgent', then=Value(2)),
+                When(appointment__triage_level='routine', then=Value(3)),
+                default=Value(4),
+                output_field=IntegerField()
+            )
         ).order_by(
-            'appointment__triage_level',
+            'triage_priority',
             'queue_number'
         )
 
@@ -219,7 +278,7 @@ class UpdateQueueStatusView(APIView):
                     doctor=queue_entry.doctor,
                     day_of_week=queue_entry.queue_date.weekday(),
                     time_of_day=queue_entry.actual_start_time.hour,
-                    patients_ahead=queue_entry.queue_number - 1,
+                    patient_ahead=queue_entry.queue_number - 1,
                     actual_duration=duration,
                     doctor_type=queue_entry.doctor.doctor_type
                 )
@@ -228,3 +287,96 @@ class UpdateQueueStatusView(APIView):
         queue_entry.save()
 
         return Response(QueueSerializer(queue_entry).data)
+
+
+class EmergencyWalkinView(APIView):
+    """
+    Admin logs an emergency walk-in patient.
+    Automatically registers a placeholder user, creates a confirmed appointment,
+    inserts them at the top of the queue (priority 1), and alerts other patients of the delay.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        if request.user.role not in ['admin', 'doctor']:
+            return Response(
+                {'error': 'Access denied.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        doctor_id = request.data.get('doctor_id')
+        patient_name = request.data.get('patient_name', 'Accident Victim').strip()
+        if not patient_name:
+            patient_name = 'Accident Victim'
+
+        try:
+            doctor = DoctorProfile.objects.get(id=doctor_id)
+        except DoctorProfile.DoesNotExist:
+            return Response(
+                {'error': 'Doctor profile not found.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # 1. Automatically create a placeholder user account
+        import uuid
+        username = f"emergency_{uuid.uuid4().hex[:10]}"
+        user = User.objects.create(
+            username=username,
+            first_name=patient_name,
+            last_name="(Emergency Walk-in)",
+            role='patient'
+        )
+        user.set_password(uuid.uuid4().hex)
+        user.save()
+
+        # 2. Create confirmed Appointment for today
+        today = timezone.now().date()
+        current_time = timezone.now().time()
+        
+        appointment = Appointment.objects.create(
+            patient=user,
+            doctor=doctor,
+            appointment_date=today,
+            appointment_time=current_time,
+            status='confirmed',
+            triage_level='emergency',
+            symptoms="Emergency walk-in triage admission."
+        )
+
+        # 3. Get next queue number
+        queue_number = assign_queue_number(doctor, today)
+
+        # 4. Create Queue Entry (Wait is 0 since they go first)
+        queue_entry = Queue.objects.create(
+            appointment=appointment,
+            patient=user,
+            doctor=doctor,
+            queue_number=queue_number,
+            queue_date=today,
+            status='waiting',
+            estimated_wait_time=0,
+            ml_predicted_wait_time=0
+        )
+
+        # 5. Send SMS Delay Notifications to other patients currently waiting for this doctor today
+        other_waiting = Queue.objects.filter(
+            doctor=doctor,
+            queue_date=today,
+            status='waiting'
+        ).exclude(id=queue_entry.id).select_related('patient')
+
+        doctor_name = doctor.user.get_full_name()
+        alert_msg = (
+            f"MediQueue Alert: An emergency case has been admitted. "
+            f"Your consultation with Dr. {doctor_name} has been delayed. "
+            f"Thank you for your patience."
+        )
+
+        for entry in other_waiting:
+            if entry.patient.phone_number:
+                send_sms(entry.patient.phone_number, alert_msg)
+
+        return Response(
+            QueueSerializer(queue_entry).data,
+            status=status.HTTP_201_CREATED
+        )

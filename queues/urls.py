@@ -3,7 +3,8 @@ from .views import (
     JoinQueueView,
     MyQueueStatusView,
     TodayQueueView,
-    UpdateQueueStatusView
+    UpdateQueueStatusView,
+    EmergencyWalkinView
 )
 
 urlpatterns = [
@@ -15,4 +16,6 @@ urlpatterns = [
     path('today/', TodayQueueView.as_view(), name='today-queue'),
     #Admin updates queue status
     path('<int:pk>/status/', UpdateQueueStatusView.as_view(), name='updated-queue-status'),
+    #Admin logs emergency walk-in
+    path('emergency-walkin/', EmergencyWalkinView.as_view(), name='emergency-walkin'),
 ]
