@@ -2,3 +2,6 @@
 [2026-07-05 01:50:31] TO: +237670000001 | MSG: Hello John, you are in the queue. Your queue number is 1. Estimated wait time: 2 minutes. - Hospital Queue System
 [2026-07-05 01:51:09] TO: +237670000001 | MSG: MediQueue Alert: An emergency case has been admitted. Your consultation with Dr. Nelly Dev has been delayed. Thank you for your patience.
 [2026-07-05 02:03:49] TO: +237670000001 | MSG: Hello John, it's almost your turn! Queue number 1, will be called soon. Please proceed to the waiting area. - Hospital Queue System
+[2026-07-07 10:04:29] TO: +237670000001 | MSG: Hello Tati, you are in the queue. Your queue number is 1. Estimated wait time: 1 minutes. - Hospital Queue System
+[2026-07-14 08:20:20] TO: +237674063431 | MSG: MediQueue Demo: This is a test message from your Hospital Queue System.
+[2026-07-14 08:23:20] TO: +237674063431 | MSG: MediQueue Demo: This is a test message from your Hospital Queue System.
