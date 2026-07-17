@@ -4,9 +4,49 @@ import { loginUser } from "../../services/api"
 import { useAuth } from "../../context/AuthContext"
 import { Lock, LogIn, User, AlertCircle, Stethoscope } from "lucide-react"
 
+const TRANSLATIONS = {
+  en: {
+    welcome_title: "Welcome back to MediQueue.",
+    welcome_desc: "Access your active queue numbers, review scheduled consultations, and check symptoms with our virtual assistant.",
+    log_in: "Log In",
+    portal: "Patient Portal",
+    username: "Username",
+    username_placeholder: "Enter your username",
+    password: "Password",
+    password_placeholder: "Enter your password",
+    logging_in: "Logging in...",
+    login_btn: "Login",
+    no_account: "Don't have an account?",
+    register_here: "Register here",
+    staff_login: "Staff / Doctor Login",
+    invalid_err: "Invalid username or password",
+    wrong_err: "Something went wrong. Please try again."
+  },
+  fr: {
+    welcome_title: "Bon retour sur MediQueue.",
+    welcome_desc: "Accédez à vos numéros de file actifs, gérez vos consultations et vérifiez vos symptômes avec l'assistant virtuel.",
+    log_in: "Se Connecter",
+    portal: "Portail Patient",
+    username: "Nom d'utilisateur",
+    username_placeholder: "Entrez votre nom d'utilisateur",
+    password: "Mot de passe",
+    password_placeholder: "Entrez votre mot de passe",
+    logging_in: "Connexion en cours...",
+    login_btn: "Connexion",
+    no_account: "Vous n'avez pas de compte ?",
+    register_here: "Inscrivez-vous ici",
+    staff_login: "Connexion Personnel / Médecin",
+    invalid_err: "Nom d'utilisateur ou mot de passe incorrect",
+    wrong_err: "Une erreur est survenue. Veuillez réessayer."
+  }
+}
+
 export default function Login() { 
     const navigate = useNavigate()
     const { login } = useAuth()
+    const [lang, setLang] = useState(localStorage.getItem("lang") || "en")
+
+    const t = TRANSLATIONS[lang]
 
     const [formData, setFormData] = useState({
         username: '',
@@ -22,23 +62,29 @@ export default function Login() {
         })
     }
 
+    const handleLangToggle = () => {
+        const nextLang = lang === "en" ? "fr" : "en"
+        setLang(nextLang)
+        localStorage.setItem("lang", nextLang)
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         setError('')
         setLoading(true)
     
-        try{
+        try {
             const response = await loginUser(formData)
 
             if (response.access) {
                 // Successful login
                 login(response.user, response.access, response.refresh)
                 navigate('/dashboard')
-            } else{
-                setError(response.error || 'Invalid username or password')
+            } else {
+                setError(response.error ? t.invalid_err : t.invalid_err)
             }
         } catch (err) {
-            setError('Something went wrong. Please try again.')
+            setError(t.wrong_err)
         } finally {
             setLoading(false)
         }
@@ -65,10 +111,10 @@ export default function Login() {
 
                     <div className="my-8 md:my-0 relative z-10">
                         <h2 className="text-3xl font-black leading-tight mb-4">
-                            Welcome back to MediQueue.
+                            {t.welcome_title}
                         </h2>
                         <p className="text-sm text-blue-100 leading-relaxed font-medium">
-                            Access your active queue numbers, review scheduled consultations, and check symptoms with our virtual assistant.
+                            {t.welcome_desc}
                         </p>
                     </div>
 
@@ -79,9 +125,18 @@ export default function Login() {
 
                 {/* Right Side: Login Form */}
                 <div className="p-8 md:p-12 md:w-7/12 flex flex-col justify-center text-left">
-                    <div className="mb-8">
-                        <h1 className="text-2xl font-black text-slate-800">Log In</h1>
-                        <p className="text-xs text-slate-400 font-bold mt-1 uppercase tracking-wider">Patient Portal</p>
+                    <div className="flex justify-between items-center mb-8">
+                        <div>
+                            <h1 className="text-2xl font-black text-slate-800">{t.log_in}</h1>
+                            <p className="text-xs text-slate-400 font-bold mt-1 uppercase tracking-wider">{t.portal}</p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={handleLangToggle}
+                            className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs rounded-xl transition cursor-pointer"
+                        >
+                            {lang.toUpperCase()}
+                        </button>
                     </div>
 
                     {error && (
@@ -94,7 +149,7 @@ export default function Login() {
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
                             <label className="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">
-                                Username
+                                {t.username}
                             </label>
                             <div className="relative">
                                 <User className="absolute left-3.5 top-3.5 h-4.5 w-4.5 text-slate-400" />
@@ -105,14 +160,14 @@ export default function Login() {
                                     onChange={handleChange}
                                     required
                                     className="w-full pl-11 pr-4 py-3 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none transition font-medium"
-                                    placeholder="Enter your username"
+                                    placeholder={t.username_placeholder}
                                 />
                             </div>
                         </div>
 
                         <div>
                             <label className="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">
-                                Password
+                                {t.password}
                             </label>
                             <div className="relative">
                                 <Lock className="absolute left-3.5 top-3.5 h-4.5 w-4.5 text-slate-400" />
@@ -123,7 +178,7 @@ export default function Login() {
                                     onChange={handleChange}
                                     required
                                     className="w-full pl-11 pr-4 py-3 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none transition font-medium"
-                                    placeholder="Enter your password"
+                                    placeholder={t.password_placeholder}
                                 />
                             </div>
                         </div>
@@ -134,20 +189,20 @@ export default function Login() {
                             className="w-full bg-blue-600 text-white py-3 rounded-xl font-extrabold text-sm hover:bg-blue-700 transition disabled:opacity-50 shadow-md shadow-blue-200 flex items-center justify-center gap-2 mt-2"
                         >
                             <LogIn className="h-4.5 w-4.5" />
-                            <span>{loading ? 'Logging in...' : 'Login'}</span>
+                            <span>{loading ? t.logging_in : t.login_btn}</span>
                         </button>
                     </form>
                     
                     <p className="text-center text-xs text-slate-500 mt-8 font-semibold">
-                        Don't have an account?{' '}
+                        {t.no_account}{' '}
                         <Link to="/register" className="text-blue-600 hover:underline">
-                            Register here
+                            {t.register_here}
                         </Link>
                     </p>
 
                     <p className="text-center text-xs text-slate-400 mt-4 font-semibold">
                         <Link to="/admin/login" className="hover:underline hover:text-slate-500">
-                            Staff / Doctor Login
+                            {t.staff_login}
                         </Link>
                     </p>
                 </div>

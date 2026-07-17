@@ -8,10 +8,123 @@ import {
   Stethoscope
 } from "lucide-react"
 
-const NAV_LINKS = ["Home", "Features", "How It Works", "About Us", "Contact"]
+const TRANSLATIONS = {
+  en: {
+    nav_home: "Home",
+    nav_features: "Features",
+    nav_how: "How It Works",
+    nav_about: "About Us",
+    nav_contact: "Contact",
+    login: "Login",
+    register: "Register",
+    welcome: "Welcome to MediQueue",
+    hero_title: "Smarter Appointments.",
+    hero_subtitle: "Better Healthcare.",
+    hero_desc: "MediQueue is a cloud-based hospital queue and appointment management system with an AI-powered patient assistant. Book appointments, get real-time updates, and reduce waiting time.",
+    hero_btn_book: "Book an Appointment",
+    hero_btn_login: "Login to Account",
+    features_title: "Our Key Features",
+    features_subtitle: "Everything you need for a safer, smarter, and faster hospital experience in Cameroon.",
+    feat1_title: "Online Appointment Booking",
+    feat1_desc: "Book appointments easily from anywhere, anytime without visiting the hospital.",
+    feat2_title: "AI Patient Assistant",
+    feat2_desc: "Chat with our AI assistant for symptom checks and health guidance 24/7.",
+    feat3_title: "Symptom-Based Triage",
+    feat3_desc: "AI-powered triage helps prioritize care based on your reported symptoms.",
+    feat4_title: "Queue Tracking",
+    feat4_desc: "Track your queue position and estimated waiting time in real-time.",
+    feat5_title: "SMS Notifications",
+    feat5_desc: "Receive SMS alerts for appointment confirmations and queue updates.",
+    feat6_title: "Smart Insights",
+    feat6_desc: "Hospitals get AI-powered insights to improve service and efficiency.",
+    how_title: "How It Works",
+    how_subtitle: "From sign-up to consultation in five simple steps",
+    how1_title: "Register / Login",
+    how1_desc: "Create an account or log in to get started.",
+    how2_title: "Book Appointment",
+    how2_desc: "Choose a department, doctor, and time that suits you.",
+    how3_title: "Get in Queue",
+    how3_desc: "Receive a queue number and estimated waiting time.",
+    how4_title: "Stay Updated",
+    how4_desc: "Get SMS notifications and real-time updates on your queue.",
+    how5_title: "Visit Hospital",
+    how5_desc: "Arrive on time and receive better, faster care.",
+    about_badge: "About Us",
+    about_title: "Built for Cameroon's Healthcare System",
+    about_desc1: "MediQueue was developed as a final year project at the Catholic University Institute of Buea (CUIB) to address the critical challenge of long waiting times and inefficient queue management in Cameroonian hospitals.",
+    about_desc2: "By combining cloud technology, artificial intelligence, and SMS notifications that work on MTN and Orange networks, MediQueue makes quality healthcare more accessible for every patient in Cameroon.",
+    cta_title: "Ready to transform your hospital experience?",
+    cta_desc: "Join hospitals across Cameroon already saving hours every day with MediQueue.",
+    cta_btn: "Get Started Free",
+    footer_desc: "MediQueue is dedicated to improving patient experience and hospital efficiency through smart technology built for Cameroon.",
+    footer_links: "Quick Links",
+    footer_contact: "Contact"
+  },
+  fr: {
+    nav_home: "Accueil",
+    nav_features: "Fonctionnalités",
+    nav_how: "Comment ça marche",
+    nav_about: "À propos",
+    nav_contact: "Contact",
+    login: "Connexion",
+    register: "S'inscrire",
+    welcome: "Bienvenue sur MediQueue",
+    hero_title: "Rendez-vous Intelligents.",
+    hero_subtitle: "Meilleure Santé.",
+    hero_desc: "MediQueue est un système cloud de gestion des files d'attente et des rendez-vous avec un assistant IA. Planifiez vos rendez-vous, suivez votre statut en temps réel et réduisez les attentes.",
+    hero_btn_book: "Prendre un Rendez-vous",
+    hero_btn_login: "Se Connecter",
+    features_title: "Nos Fonctionnalités Clés",
+    features_subtitle: "Tout ce dont vous avez besoin pour une expérience hospitalière plus sûre, plus intelligente et plus rapide au Cameroun.",
+    feat1_title: "Prise de RDV en Ligne",
+    feat1_desc: "Prenez rendez-vous facilement où que vous soyez, à tout moment, sans avoir à vous déplacer.",
+    feat2_title: "Assistant Patient par IA",
+    feat2_desc: "Discutez 24h/24 et 7j/7 avec notre assistant virtuel pour vérifier vos symptômes.",
+    feat3_title: "Triage des Symptômes",
+    feat3_desc: "Le triage automatique priorise votre prise en charge selon la gravité de vos symptômes.",
+    feat4_title: "Suivi de File d'Attente",
+    feat4_desc: "Suivez en temps réel votre position dans la file d'attente et votre heure de passage estimée.",
+    feat5_title: "Notifications SMS",
+    feat5_desc: "Recevez des alertes SMS pour les confirmations de rendez-vous et les mises à jour de passage.",
+    feat6_title: "Statistiques Intelligentes",
+    feat6_desc: "Les hôpitaux reçoivent des analyses IA pour optimiser la qualité du service.",
+    how_title: "Comment ça marche",
+    how_subtitle: "De l'inscription à la consultation en cinq étapes simples",
+    how1_title: "S'inscrire / Se Connecter",
+    how1_desc: "Créez votre compte ou connectez-vous pour commencer.",
+    how2_title: "Prendre un Rendez-vous",
+    how2_desc: "Choisissez le service, le médecin et le créneau horaire qui vous conviennent.",
+    how3_title: "Entrer en File d'Attente",
+    how3_desc: "Recevez un numéro de passage et votre temps d'attente estimé.",
+    how4_title: "Suivi de Position",
+    how4_desc: "Recevez des alertes SMS et suivez votre statut en temps réel.",
+    how5_title: "Consulter le Médecin",
+    how5_desc: "Présentez-vous à l'heure pour votre consultation simplifiée.",
+    about_badge: "À propos de nous",
+    about_title: "Conçu pour le Système de Santé Camerounais",
+    about_desc1: "MediQueue a été développé comme projet de fin d'études à l'Université Catholique de Buea (CUIB) pour résoudre le problème des longues files d'attente dans nos hôpitaux.",
+    about_desc2: "En associant les technologies cloud, l'intelligence artificielle et des SMS compatibles avec MTN et Orange, MediQueue rend les soins de santé plus accessibles à tous au Cameroun.",
+    cta_title: "Prêt à transformer votre expérience hospitalière ?",
+    cta_desc: "Rejoignez les hôpitaux camerounais qui gagnent du temps chaque jour grâce à MediQueue.",
+    cta_btn: "Commencer Gratuitement",
+    footer_desc: "MediQueue s'engage à optimiser l'expérience des patients et l'efficacité des soins grâce à une technologie adaptée au Cameroun.",
+    footer_links: "Liens Rapides",
+    footer_contact: "Contact"
+  }
+}
 
-function Navbar() {
+function Navbar({ lang, setLang }) {
   const [open, setOpen] = useState(false)
+  const t = TRANSLATIONS[lang]
+
+  const navItems = [
+    { label: t.nav_home, link: "#home" },
+    { label: t.nav_features, link: "#features" },
+    { label: t.nav_how, link: "#how-it-works" },
+    { label: t.nav_about, link: "#about-us" },
+    { label: t.nav_contact, link: "#contact" }
+  ]
+
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-100">
       <div className="mx-auto max-w-7xl flex items-center justify-between px-6 py-4">
@@ -20,60 +133,75 @@ function Navbar() {
           <div className="h-10 w-10 bg-blue-700 rounded-xl flex items-center justify-center shadow-lg">
             <Stethoscope className="h-5 w-5 text-white" />
           </div>
-          <div>
+          <div className="text-left">
             <span className="text-2xl font-extrabold text-blue-900">MediQueue</span>
-            <p className="text-s text-blue-400 leading-none">Smart Care. Less Wait.</p>
+            <p className="text-[10px] text-blue-400 leading-none">Smart Care. Less Wait.</p>
           </div>
         </Link>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8">
-          {NAV_LINKS.map((item) => (
-            <a key={item}
-              href={`#${item.toLowerCase().replace(" ", "-")}`}
+          {navItems.map((item) => (
+            <a key={item.label}
+              href={item.link}
               className="text-sm font-medium text-gray-600 hover:text-blue-700 transition border-b-2 border-transparent hover:border-blue-700 pb-0.5">
-              {item}
+              {item.label}
             </a>
           ))}
         </nav>
 
         {/* Buttons */}
         <div className="hidden md:flex items-center gap-3">
+          <button
+            onClick={() => setLang(lang === "en" ? "fr" : "en")}
+            className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs rounded-xl transition cursor-pointer"
+          >
+            {lang.toUpperCase()}
+          </button>
           <Link to="/login"
             className="px-6 py-2 text-sm font-semibold text-blue-700 border-2 border-blue-700 rounded-lg hover:bg-blue-50 transition">
-            Login
+            {t.login}
           </Link>
           <Link to="/register"
             className="px-6 py-2 text-sm font-semibold text-white bg-blue-700 rounded-lg shadow-lg hover:bg-blue-800 transition">
-            Register
+            {t.register}
           </Link>
         </div>
 
         {/* Mobile toggle */}
-        <button onClick={() => setOpen(!open)} className="md:hidden">
-          {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        <div className="flex items-center gap-3 md:hidden">
+          <button
+            onClick={() => setLang(lang === "en" ? "fr" : "en")}
+            className="px-3 py-1 bg-slate-100 text-slate-700 font-extrabold text-xs rounded-xl"
+          >
+            {lang.toUpperCase()}
+          </button>
+          <button onClick={() => setOpen(!open)}>
+            {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}
       {open && (
-        <div className="md:hidden bg-white border-t border-gray-100 px-6 py-4 space-y-3">
-          {NAV_LINKS.map((item) => (
-            <a key={item} href={`#${item.toLowerCase().replace(" ", "-")}`}
+        <div className="md:hidden bg-white border-t border-gray-100 px-6 py-4 space-y-3 text-left">
+          {navItems.map((item) => (
+            <a key={item.label} href={item.link}
               onClick={() => setOpen(false)}
               className="block text-sm font-medium text-gray-600 py-2">
-              {item}
+              {item.label}
             </a>
           ))}
-          <Link to="/login" className="block text-center py-2 border-2 border-blue-700 text-blue-700 rounded-lg font-semibold text-sm">Login</Link>
-          <Link to="/register" className="block text-center py-2 bg-blue-700 text-white rounded-lg font-semibold text-sm">Register</Link>
+          <Link to="/login" className="block text-center py-2 border-2 border-blue-700 text-blue-700 rounded-lg font-semibold text-sm">{t.login}</Link>
+          <Link to="/register" className="block text-center py-2 bg-blue-700 text-white rounded-lg font-semibold text-sm">{t.register}</Link>
         </div>
       )}
     </header>
   )
 }
 
-function Hero() {
+function Hero({ lang }) {
+  const t = TRANSLATIONS[lang]
   return (
     <section id="home" className="relative overflow-hidden min-h-[600px]">
       {/* Background hospital image */}
@@ -89,63 +217,72 @@ function Hero() {
       <div className="relative mx-auto max-w-7xl px-6 py-24 lg:py-32">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left content */}
-          <div>
+          <div className="text-left">
             <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-2 text-blue-200 text-xs font-semibold uppercase tracking-wider mb-6">
-              <Stethoscope className="h-3.5 w-3.5" /> Welcome to MediQueue
+              <Stethoscope className="h-3.5 w-3.5" /> {t.welcome}
             </div>
 
             <h1 className="text-5xl lg:text-6xl font-black text-white leading-tight mb-6">
-              Smarter
-              <br />
-              Appointments.
-              <br />
-              <span className="text-blue-300">Better Healthcare.</span>
+              {lang === "en" ? (
+                <>
+                  Smarter
+                  <br />
+                  Appointments.
+                  <br />
+                  <span className="text-blue-300">Better Healthcare.</span>
+                </>
+              ) : (
+                <>
+                  Rendez-vous
+                  <br />
+                  Intelligents.
+                  <br />
+                  <span className="text-blue-300">Meilleure Santé.</span>
+                </>
+              )}
             </h1>
 
-            <p className="text-lg text-blue-100 mb-8 max-w-lg leading-relaxed">
-              MediQueue is a cloud-based hospital queue and appointment management
-              system with an AI-powered patient assistant. Book appointments,
-              get real-time updates, and reduce waiting time.
+            <p className="text-lg text-blue-100 mb-8 max-w-lg leading-relaxed font-medium">
+              {t.hero_desc}
             </p>
 
             <div className="flex flex-wrap gap-4">
               <Link to="/register"
                 className="inline-flex items-center gap-2 bg-blue-600 text-white px-7 py-3.5 rounded-lg font-bold shadow-xl hover:bg-blue-700 transition">
                 <CalendarCheck className="h-5 w-5" />
-                Book an Appointment
+                {t.hero_btn_book}
               </Link>
               <Link to="/login"
                 className="inline-flex items-center gap-2 bg-white/10 border-2 border-white/40 text-white px-7 py-3.5 rounded-lg font-semibold hover:bg-white/20 transition">
                 <Users className="h-5 w-5" />
-                Login to Account
+                {t.hero_btn_login}
               </Link>
             </div>
           </div>
-
-           
         </div>
       </div>
     </section>
   )
 }
 
-function Features() {
+function Features({ lang }) {
+  const t = TRANSLATIONS[lang]
   const features = [
-    { icon: CalendarCheck, title: "Online Appointment Booking", desc: "Book appointments easily from anywhere, anytime without visiting the hospital.", color: "bg-blue-50 text-blue-600" },
-    { icon: Bot, title: "AI Patient Assistant", desc: "Chat with our AI assistant for symptom checks and health guidance 24/7.", color: "bg-purple-50 text-purple-600" },
-    { icon: Stethoscope, title: "Symptom-Based Triage", desc: "AI-powered triage helps prioritize care based on your reported symptoms.", color: "bg-green-50 text-green-600" },
-    { icon: ListOrdered, title: "Queue Tracking", desc: "Track your queue position and estimated waiting time in real-time.", color: "bg-orange-50 text-orange-600" },
-    { icon: MessageSquare, title: "SMS Notifications", desc: "Receive SMS alerts for appointment confirmations and queue updates.", color: "bg-pink-50 text-pink-600" },
-    { icon: Brain, title: "Smart Insights", desc: "Hospitals get AI-powered insights to improve service and efficiency.", color: "bg-indigo-50 text-indigo-600" },
+    { icon: CalendarCheck, title: t.feat1_title, desc: t.feat1_desc, color: "bg-blue-50 text-blue-600" },
+    { icon: Bot, title: t.feat2_title, desc: t.feat2_desc, color: "bg-purple-50 text-purple-600" },
+    { icon: Stethoscope, title: t.feat3_title, desc: t.feat3_desc, color: "bg-green-50 text-green-600" },
+    { icon: ListOrdered, title: t.feat4_title, desc: t.feat4_desc, color: "bg-orange-50 text-orange-600" },
+    { icon: MessageSquare, title: t.feat5_title, desc: t.feat5_desc, color: "bg-pink-50 text-pink-600" },
+    { icon: Brain, title: t.feat6_title, desc: t.feat6_desc, color: "bg-indigo-50 text-indigo-600" },
   ]
 
   return (
     <section id="features" className="py-24 bg-gray-50">
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto max-w-7xl px-6 text-left">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-black text-gray-900 mb-4">Our Key Features</h2>
+          <h2 className="text-4xl font-black text-gray-900 mb-4">{t.features_title}</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Everything you need for a smarter, faster hospital experience
+            {t.features_subtitle}
           </p>
         </div>
 
@@ -166,22 +303,23 @@ function Features() {
   )
 }
 
-function HowItWorks() {
+function HowItWorks({ lang }) {
+  const t = TRANSLATIONS[lang]
   const steps = [
-    { icon: UserPlus, title: "Register / Login", desc: "Create an account or log in to get started." },
-    { icon: CalendarCheck, title: "Book Appointment", desc: "Choose a department, doctor, and time that suits you." },
-    { icon: Hash, title: "Get in Queue", desc: "Receive a queue number and estimated waiting time." },
-    { icon: MessageSquare, title: "Stay Updated", desc: "Get SMS notifications and real-time updates on your queue." },
-    { icon: CheckCircle, title: "Visit Hospital", desc: "Arrive on time and receive better, faster care." },
+    { icon: UserPlus, title: t.how1_title, desc: t.how1_desc },
+    { icon: CalendarCheck, title: t.how2_title, desc: t.how2_desc },
+    { icon: Hash, title: t.how3_title, desc: t.how3_desc },
+    { icon: MessageSquare, title: t.how4_title, desc: t.how4_desc },
+    { icon: CheckCircle, title: t.how5_title, desc: t.how5_desc },
   ]
 
   return (
     <section id="how-it-works" className="py-24 bg-white">
       <div className="mx-auto max-w-7xl px-6">
         <div className="text-center mb-20">
-          <h2 className="text-4xl font-black text-gray-900 mb-4">How It Works</h2>
+          <h2 className="text-4xl font-black text-gray-900 mb-4">{t.how_title}</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            From sign-up to consultation in five simple steps
+            {t.how_subtitle}
           </p>
         </div>
 
@@ -210,25 +348,22 @@ function HowItWorks() {
   )
 }
 
-function AboutUs() {
+function AboutUs({ lang }) {
+  const t = TRANSLATIONS[lang]
   return (
     <section id="about-us" className="py-24 bg-blue-50">
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto max-w-7xl px-6 text-left">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div>
-            <p className="text-sm font-bold uppercase tracking-widest text-blue-600 mb-3">About Us</p>
+            <p className="text-sm font-bold uppercase tracking-widest text-blue-600 mb-3">{t.about_badge}</p>
             <h2 className="text-4xl font-black text-gray-900 mb-6">
-              Built for Cameroon's Healthcare System
+              {t.about_title}
             </h2>
             <p className="text-gray-600 leading-relaxed mb-6">
-              MediQueue was developed as a final year project at the Catholic University
-              Institute of Buea (CUIB) to address the critical challenge of long waiting
-              times and inefficient queue management in Cameroonian hospitals.
+              {t.about_desc1}
             </p>
             <p className="text-gray-600 leading-relaxed mb-8">
-              By combining cloud technology, artificial intelligence, and SMS notifications
-              that work on MTN and Orange networks, MediQueue makes quality healthcare
-              more accessible for every patient in Cameroon.
+              {t.about_desc2}
             </p>
             <div className="flex flex-wrap gap-4">
               {["AI-Powered", "SMS via MTN & Orange", "Cloud-Based", "Real-time"].map((tag) => (
@@ -239,14 +374,14 @@ function AboutUs() {
             </div>
           </div>
           <div className="relative">
-           <img
-          src="/landing_hero.png"
-          alt="Hospital"
-          className="w-full h-80 object-cover"
-        />
+             <img
+              src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&auto=format&fit=crop&q=80"
+              alt="Hospital"
+              className="w-full h-80 object-cover rounded-3xl shadow-xl"
+            />
             <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-xl p-6">
               <p className="text-4xl font-black text-blue-700">98%</p>
-              <p className="text-gray-600 text-sm">Patient Satisfaction</p>
+              <p className="text-gray-600 text-sm">{lang === "en" ? "Patient Satisfaction" : "Satisfaction des Patients"}</p>
             </div>
           </div>
         </div>
@@ -255,26 +390,27 @@ function AboutUs() {
   )
 }
 
-function CTA() {
+function CTA({ lang }) {
+  const t = TRANSLATIONS[lang]
   return (
     <section className="py-20 px-6 bg-white">
       <div className="mx-auto max-w-5xl bg-gradient-to-br from-blue-800 to-blue-600 rounded-3xl p-16 text-center relative overflow-hidden shadow-2xl">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-x-1/2 -translate-y-1/2" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-1/2 translate-y-1/2" />
         <h2 className="relative text-4xl font-black text-white mb-4">
-          Ready to transform your hospital experience?
+          {t.cta_title}
         </h2>
         <p className="relative text-blue-100 text-lg mb-8 max-w-2xl mx-auto">
-          Join hospitals across Cameroon already saving hours every day with MediQueue.
+          {t.cta_desc}
         </p>
         <div className="relative flex flex-wrap justify-center gap-4">
           <Link to="/register"
             className="inline-flex items-center gap-2 bg-white text-blue-800 px-8 py-4 rounded-lg font-bold shadow-xl hover:bg-blue-50 transition">
-            Get Started Free <ArrowRight className="h-4 w-4" />
+            {t.cta_btn} <ArrowRight className="h-4 w-4" />
           </Link>
           <a href="#contact"
             className="inline-flex items-center gap-2 border-2 border-white/40 text-white px-8 py-4 rounded-lg font-semibold hover:bg-white/10 transition">
-            Contact Us
+            {t.nav_contact}
           </a>
         </div>
       </div>
@@ -282,9 +418,10 @@ function CTA() {
   )
 }
 
-function Footer() {
+function Footer({ lang }) {
+  const t = TRANSLATIONS[lang]
   return (
-    <footer id="contact" className="bg-blue-900 text-blue-50">
+    <footer id="contact" className="bg-blue-900 text-blue-50 text-left">
       <div className="mx-auto max-w-7xl px-6 py-16">
         <div className="grid gap-12 lg:grid-cols-4 mb-12">
           <div className="lg:col-span-2">
@@ -298,8 +435,7 @@ function Footer() {
               </div>
             </div>
             <p className="text-blue-200 max-w-sm leading-relaxed mb-6">
-              MediQueue is dedicated to improving patient experience and hospital
-              efficiency through smart technology built for Cameroon.
+              {t.footer_desc}
             </p>
             <div className="flex gap-3">
               {[Share2, Mail, Phone, MapPin].map((Icon, i) => (
@@ -312,24 +448,23 @@ function Footer() {
           </div>
 
           <div>
-            <h4 className="text-sm font-bold uppercase tracking-wider text-white mb-4">Quick Links</h4>
+            <h4 className="text-sm font-bold uppercase tracking-wider text-white mb-4">{t.footer_links}</h4>
             <ul className="space-y-2 text-sm text-blue-200">
-              {NAV_LINKS.map((item) => (
-                <li key={item}>
-                  <a href={`#${item.toLowerCase().replace(" ", "-")}`}
-                    className="hover:text-white transition">{item}</a>
-                </li>
-              ))}
-              <li><Link to="/login" className="hover:text-white transition">Login</Link></li>
-              <li><Link to="/register" className="hover:text-white transition">Register</Link></li>
+              <li><a href="#home" className="hover:text-white transition">{t.nav_home}</a></li>
+              <li><a href="#features" className="hover:text-white transition">{t.nav_features}</a></li>
+              <li><a href="#how-it-works" className="hover:text-white transition">{t.nav_how}</a></li>
+              <li><a href="#about-us" className="hover:text-white transition">{t.nav_about}</a></li>
+              <li><a href="#contact" className="hover:text-white transition">{t.nav_contact}</a></li>
+              <li><Link to="/login" className="hover:text-white transition">{t.login}</Link></li>
+              <li><Link to="/register" className="hover:text-white transition">{t.register}</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-sm font-bold uppercase tracking-wider text-white mb-4">Contact</h4>
+            <h4 className="text-sm font-bold uppercase tracking-wider text-white mb-4">{t.footer_contact}</h4>
             <ul className="space-y-3 text-sm text-blue-200">
               <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 flex-shrink-0" /> +256 700 123 456
+                <Phone className="h-4 w-4 flex-shrink-0" /> +237 600 123 456
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 flex-shrink-0" /> info@mediqueue.cm
@@ -354,17 +489,24 @@ function Footer() {
 }
 
 export default function LandingPage() {
+  const [lang, setLang] = useState(localStorage.getItem("lang") || "en")
+
+  const handleSetLang = (newLang) => {
+    setLang(newLang)
+    localStorage.setItem("lang", newLang)
+  }
+
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
+      <Navbar lang={lang} setLang={handleSetLang} />
       <main>
-        <Hero />
-        <Features />
-        <HowItWorks />
-        <AboutUs />
-        <CTA />
+        <Hero lang={lang} />
+        <Features lang={lang} />
+        <HowItWorks lang={lang} />
+        <AboutUs lang={lang} />
+        <CTA lang={lang} />
       </main>
-      <Footer />
+      <Footer lang={lang} />
     </div>
   )
 }
